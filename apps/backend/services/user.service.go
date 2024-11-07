@@ -7,7 +7,6 @@ import (
 
 	"github.com/ANU7MADHAV/algo-arena/models"
 	"github.com/golang-jwt/jwt/v5"
-
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -93,7 +92,7 @@ func (s *AuthService) LoginUser(credentials *models.User) (*models.AuthResponse,
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password),[]byte(credentials.Password))
 	if err != nil {
-		return nil,errors.New("Invalid credentials")
+		return nil,errors.New("invalid credentials")
 	}
 
 	token,err := s.generateJWT(user)
