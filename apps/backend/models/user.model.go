@@ -15,3 +15,9 @@ type User struct {
 	CreatedAt      time.Time         `bson:"created_at" json:"created_at"`
 	UpdatedAt      time.Time         `bson:"updated_at" json:"updated_at"`
 }
+
+
+type AuthResponse struct {
+	User  *User  `json:"user"`
+	Token string `json:"token"`
+}
