@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"log"
 	"time"
 
@@ -28,6 +29,7 @@ func New(mongo *mongo.Client) User {
 }
 
 func returnCollectPointer(collection string) *mongo.Collection {
+
 	return client.Database("algo_arena").Collection(collection)
 }
 
@@ -68,5 +70,37 @@ func (u *User) CreateUser(entry User) (User, error) {
 	}
 
 	entry.ID = insertResult.InsertedID.(primitive.ObjectID).Hex()
+	return entry, nil
+}
+
+func (u *User) UpdateUser(id string, entry User) (User, error) {
+	collection := returnCollectPointer("users")
+
+	mongoId, err := primitive.ObjectIDFromHex(id)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	filter := bson.D{{Key: "_id", Value: mongoId}}
+
+	update := bson.D{{Key: "$set", Value: bson.D{
+		{Key: "username", Value: entry.Username},
+		{Key: "email", Value: entry.Email},
+		{Key: "password", Value: entry.Password},
+	}}}
+
+	result, err := collection.UpdateOne(context.TODO(), filter, update)
+
+	if err != nil {
+		panic(err)
+	}
+
+	if result.MatchedCount == 0 {
+		return User{}, errors.New("user not found")
+	} else if result.ModifiedCount == 0 {
+		log.Println("No modifications were made to the user data")
+
+	}
 	return entry, nil
 }
