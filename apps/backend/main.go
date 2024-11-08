@@ -2,54 +2,32 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
+	"time"
 
-	"github.com/ANU7MADHAV/algo-arena/config"
-	"github.com/ANU7MADHAV/algo-arena/delivery/http"
-	domain "github.com/ANU7MADHAV/algo-arena/domain/usecase"
-	"go.mongodb.org/mongo-driver/mongo"
-
-	"github.com/gin-gonic/gin"
+	"github.com/ANU7MADHAV/algo-arena/db"
+	"github.com/ANU7MADHAV/algo-arena/routes"
+	"github.com/ANU7MADHAV/algo-arena/services"
 )
-
-var (
-	server      *gin.Engine
-	us          domain.UserUseCase
-	uc          http.UserController
-	ctx         context.Context
-	mongoClient *mongo.Client
-)
-
-func init() {
-	ctx = context.TODO()
-
-	// mongo
-
-	mongoClient, err := config.Connect()
-
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	fmt.Println("Mongo connected")
-	us := domain.NewUserUseCase(mongoClient)
-	uc = http.NewUserController(us)
-
-	server = gin.Default()
-
-}
 
 func main() {
-	defer func(mongoClient *mongo.Client, ctx context.Context) {
-		err := mongoClient.Disconnect(ctx)
-		if err != nil {
-			fmt.Println("error")
-			return
-		}
-	}(mongoClient, ctx)
-	basepath := server.Group("/v1")
-	uc.RegisterRoutes(basepath)
+	mongoClient, err := db.ConnectMongo()
 
-	log.Fatal(server.Run(":3000"))
+	if err != nil {
+		log.Panic(err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Millisecond)
+	defer cancel()
+
+	r := routes.SetupRoutes()
+
+	defer func() {
+		if err = mongoClient.Disconnect(ctx); err != nil {
+			panic(err)
+		}
+	}()
+	services.New(mongoClient)
+
+	r.Run()
 }
