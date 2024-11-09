@@ -22,19 +22,20 @@ type User struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty" bson:"updated_at,omitempty"`
 }
 
-var client *mongo.Client
+var Client *mongo.Client
 
 func New(mongo *mongo.Client) {
-	client = mongo
+
+	Client = mongo
 }
 
-func returnCollectPointer(collection string) *mongo.Collection {
+func ReturnCollectPointer(collection string) *mongo.Collection {
 
-	return client.Database("algo_arena").Collection(collection)
+	return Client.Database("algo_arena").Collection(collection)
 }
 
 func (u *User) GetAllUsers() ([]User, error) {
-	collection := returnCollectPointer("users")
+	collection := ReturnCollectPointer("users")
 
 	var users []User
 
@@ -56,7 +57,7 @@ func (u *User) GetAllUsers() ([]User, error) {
 }
 
 func (u *User) ChecKUser(entry User) (User, error) {
-	collection := returnCollectPointer("users")
+	collection := ReturnCollectPointer("users")
 
 	// Check if user already exists
 	var existingUser User
@@ -68,11 +69,10 @@ func (u *User) ChecKUser(entry User) (User, error) {
 	}
 
 	return existingUser, nil
-
 }
 
 func (u *User) CreateUser(entry User) (User, error) {
-	collection := returnCollectPointer("users")
+	collection := ReturnCollectPointer("users")
 
 	entry.Role = "user"
 	entry.CreatedAt = time.Now()
@@ -90,7 +90,7 @@ func (u *User) CreateUser(entry User) (User, error) {
 }
 
 func (u *User) UpdateUser(id string, entry User) (User, error) {
-	collection := returnCollectPointer("users")
+	collection := ReturnCollectPointer("users")
 
 	mongoId, err := primitive.ObjectIDFromHex(id)
 
