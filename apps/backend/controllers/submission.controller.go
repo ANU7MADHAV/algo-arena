@@ -1,0 +1,29 @@
+package controllers
+
+import (
+	"fmt"
+	"log"
+	"net/http"
+
+	"github.com/ANU7MADHAV/algo-arena/services"
+	"github.com/gin-gonic/gin"
+)
+
+func CreateSubmission(c *gin.Context) {
+	var entry services.Submission
+	submissionService := &services.Submission{}
+
+	if err := c.ShouldBindJSON(&entry); err != nil {
+		c.JSON(http.StatusBadGateway, gin.H{"Error": err.Error()})
+		return
+	}
+
+	submission, err := submissionService.CreateSubmission(entry)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("submission", submission)
+
+	c.JSON(http.StatusOK, submission)
+}

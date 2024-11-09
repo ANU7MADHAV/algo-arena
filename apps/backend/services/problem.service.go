@@ -57,3 +57,22 @@ func (p *Problem) ListProblems() ([]Problem, error) {
 
 	return problems, nil
 }
+
+func (p *Problem) GetProblemById(id string) (Problem, error) {
+	collection := ReturnCollectPointer("problem")
+
+	mongoId, err := primitive.ObjectIDFromHex(id)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	filter := bson.D{{Key: "_id", Value: mongoId}}
+
+	var problem Problem
+
+	if err = collection.FindOne(context.TODO(), filter).Decode(&problem); err != nil {
+		log.Fatal(err)
+	}
+	return problem, nil
+}
