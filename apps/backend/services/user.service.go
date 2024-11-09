@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"time"
 
@@ -23,9 +24,8 @@ type User struct {
 
 var client *mongo.Client
 
-func New(mongo *mongo.Client) User {
+func New(mongo *mongo.Client) {
 	client = mongo
-	return User{}
 }
 
 func returnCollectPointer(collection string) *mongo.Collection {
@@ -53,6 +53,22 @@ func (u *User) GetAllUsers() ([]User, error) {
 	}
 
 	return users, nil
+}
+
+func (u *User) ChecKUser(entry User) (User, error) {
+	collection := returnCollectPointer("users")
+
+	// Check if user already exists
+	var existingUser User
+	err := collection.FindOne(context.Background(), bson.D{{Key: "email", Value: entry.Email}}).Decode(&existingUser)
+
+	// If user is found, return error
+	if err == nil {
+		return User{}, fmt.Errorf("user with email %s already exists", entry.Email)
+	}
+
+	return existingUser, nil
+
 }
 
 func (u *User) CreateUser(entry User) (User, error) {

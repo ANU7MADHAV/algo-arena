@@ -17,7 +17,6 @@ import (
 var user services.User
 
 func CreateToken(email string) (string, error) {
-	fmt.Println("hitted")
 	key, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
 		log.Fatal(err)
@@ -30,7 +29,7 @@ func CreateToken(email string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
 	tokenString, err := token.SignedString(key)
 	fmt.Println("tokensharing", tokenString)
-	fmt.Println("err", err)
+
 	if err != nil {
 		return "", err
 	}
@@ -54,20 +53,26 @@ func CreateUsers(c *gin.Context) {
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
-	users, err := user.CreateUser(entry)
+	user, err := user.ChecKUser(entry)
 
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	token, err := CreateToken(users.Email)
-	if err != nil {
-		log.Println(err)
-		return
-	}
+	if err == nil {
+		users, err := user.CreateUser(entry)
 
-	fmt.Println("token", token)
-	c.JSON(http.StatusOK, token)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		token, err := CreateToken(users.Email)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+
+		fmt.Println("token", token)
+		c.JSON(http.StatusOK, token)
+	}
+	c.JSON(http.StatusFound, "Email already exist")
+
 }
 
 func UpdateUser(c *gin.Context) {
