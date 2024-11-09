@@ -1,5 +1,6 @@
 package services
 
 type Model struct {
-	User User
+	User    User
+	Problem Problem
 }
