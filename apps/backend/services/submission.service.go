@@ -70,6 +70,8 @@ func (s *Submission) GetSubmissionById(id string) (Submission, error) {
 func (s *Submission) GetAllSubmissions() ([]Submission, error) {
 	collection := ReturnCollectPointer("submission")
 
+	// fmt.Println("collections", collection)
+
 	var submissions []Submission
 
 	cursor, err := collection.Find(context.Background(), bson.D{})
@@ -78,13 +80,22 @@ func (s *Submission) GetAllSubmissions() ([]Submission, error) {
 		log.Fatal(err)
 	}
 
-	cursor.Close(context.Background())
+	defer cursor.Close(context.Background())
 
 	for cursor.Next(context.Background()) {
 		var submission Submission
-		cursor.Decode(&submission)
 
+		if err = cursor.Decode(&submission); err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println("sub", submission)
 		submissions = append(submissions, submission)
 	}
+
+	if err := cursor.Err(); err != nil {
+		log.Fatal(err)
+		return submissions, err
+	}
+
 	return submissions, nil
 }
