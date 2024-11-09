@@ -25,7 +25,6 @@ type User struct {
 var Client *mongo.Client
 
 func New(mongo *mongo.Client) {
-
 	Client = mongo
 }
 
@@ -56,14 +55,34 @@ func (u *User) GetAllUsers() ([]User, error) {
 	return users, nil
 }
 
+func (u *User) GetUserById(id string) error {
+	collection := ReturnCollectPointer("users")
+
+	mongoId, err := primitive.ObjectIDFromHex(id)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	filter := bson.D{{Key: "_id", Value: mongoId}}
+
+	var user User
+	err = collection.FindOne(context.TODO(), filter).Decode(&user)
+
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+
+	return nil
+}
+
 func (u *User) ChecKUser(entry User) (User, error) {
 	collection := ReturnCollectPointer("users")
 
-	// Check if user already exists
 	var existingUser User
 	err := collection.FindOne(context.Background(), bson.D{{Key: "email", Value: entry.Email}}).Decode(&existingUser)
 
-	// If user is found, return error
 	if err == nil {
 		return User{}, fmt.Errorf("user with email %s already exists", entry.Email)
 	}

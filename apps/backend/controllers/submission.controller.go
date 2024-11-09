@@ -27,3 +27,28 @@ func CreateSubmission(c *gin.Context) {
 
 	c.JSON(http.StatusOK, submission)
 }
+
+func GetAllSubmissions(c *gin.Context) {
+	submissionsService := &services.Submission{}
+
+	submissions, err := submissionsService.GetAllSubmissions()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	c.JSON(http.StatusOK, submissions)
+}
+
+func GetSubmissionById(c *gin.Context) {
+
+	submissionService := &services.Submission{}
+	id := c.Param("id")
+
+	submission, err := submissionService.GetSubmissionById(id)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	c.JSON(http.StatusOK, submission)
+}
