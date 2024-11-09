@@ -33,6 +33,8 @@ func GetAllSubmissions(c *gin.Context) {
 
 	submissions, err := submissionsService.GetAllSubmissions()
 
+	fmt.Println("submissions", submissions)
+
 	if err != nil {
 		log.Fatal(err)
 	}
