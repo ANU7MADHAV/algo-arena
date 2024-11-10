@@ -50,6 +50,7 @@ func GetSubmissionById(c *gin.Context) {
 
 	if err != nil {
 		log.Fatal(err)
+		c.JSON(404, gin.H{"message": "Submission not found"})
 	}
 
 	c.JSON(http.StatusOK, submission)

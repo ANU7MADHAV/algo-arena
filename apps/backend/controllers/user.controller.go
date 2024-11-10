@@ -29,7 +29,6 @@ func CreateToken(email string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
 	tokenString, err := token.SignedString(key)
 	fmt.Println("tokensharing", tokenString)
-
 	if err != nil {
 		return "", err
 	}
@@ -43,7 +42,7 @@ func GetAllUsers(c *gin.Context) {
 		log.Println(err)
 		return
 	}
-	c.JSON(200, gin.H{"message": users})
+	c.JSON(200, users)
 }
 
 func CreateUsers(c *gin.Context) {
@@ -69,10 +68,22 @@ func CreateUsers(c *gin.Context) {
 		}
 
 		fmt.Println("token", token)
-		c.JSON(http.StatusOK, token)
+		c.JSON(http.StatusOK, users)
 	}
 	c.JSON(http.StatusFound, "Email already exist")
 
+}
+
+func GetUserById(c *gin.Context) {
+	id := c.Param("id")
+
+	user, err := user.GetUserById(id)
+
+	if err != nil {
+		log.Println(err)
+		c.JSON(404, gin.H{"message": "User not found"})
+	}
+	c.JSON(200, user)
 }
 
 func UpdateUser(c *gin.Context) {

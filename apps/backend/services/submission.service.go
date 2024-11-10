@@ -71,7 +71,7 @@ func (s Submission) CreateSubmission(entry Submission) (Submission, error) {
 	entry.CreatedAt = time.Now()
 	entry.UpdatedAt = time.Now()
 
-	er := user.GetUserById(entry.UserId)
+	_, er := user.GetUserById(entry.UserId)
 
 	fmt.Println("err", er)
 
