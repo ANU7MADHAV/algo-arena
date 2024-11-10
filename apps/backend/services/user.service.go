@@ -58,6 +58,8 @@ func (u *User) GetAllUsers() ([]User, error) {
 func (u *User) GetUserById(id string) error {
 	collection := ReturnCollectPointer("users")
 
+	fmt.Println("hitted")
+
 	mongoId, err := primitive.ObjectIDFromHex(id)
 
 	if err != nil {
