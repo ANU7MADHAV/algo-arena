@@ -55,29 +55,29 @@ func (u *User) GetAllUsers() ([]User, error) {
 	return users, nil
 }
 
-func (u *User) GetUserById(id string) error {
-	collection := ReturnCollectPointer("users")
-
-	fmt.Println("hitted")
-
-	mongoId, err := primitive.ObjectIDFromHex(id)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	filter := bson.D{{Key: "_id", Value: mongoId}}
-
-	var user User
-	err = collection.FindOne(context.TODO(), filter).Decode(&user)
-
-	if err != nil {
-		log.Fatal(err)
-		return err
-	}
-
-	return nil
-}
+// func (u *User) GetUserById(id string) error {
+// 	collection := ReturnCollectPointer("users")
+//
+// 	fmt.Println("hitted")
+//
+// 	mongoId, err := primitive.ObjectIDFromHex(id)
+//
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+//
+// 	filter := bson.D{{Key: "_id", Value: mongoId}}
+//
+// 	var user User
+// 	err = collection.FindOne(context.TODO(), filter).Decode(&user)
+//
+// 	if err != nil {
+// 		log.Fatal(err)
+// 		return err
+// 	}
+//
+// 	return nil
+// }
 
 func (u *User) ChecKUser(entry User) (User, error) {
 	collection := ReturnCollectPointer("users")
