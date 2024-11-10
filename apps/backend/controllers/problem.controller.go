@@ -55,6 +55,7 @@ func GetProblemById(c *gin.Context) {
 
 	if err != nil {
 		log.Fatal(err)
+		c.JSON(404, gin.H{"message": "Problem not found"})
 	}
 
 	fmt.Println("problem", problem)

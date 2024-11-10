@@ -19,16 +19,21 @@ func SetupRoutes() *gin.Engine {
 		})
 
 		v1.GET("/users", controllers.GetAllUsers)
-		v1.POST("/users", controllers.CreateUsers)
+		v1.GET("/users/:id")
+		v1.POST("/users/create", controllers.CreateUsers)
 		v1.PUT("/users/:id", controllers.UpdateUser)
 
-		v1.POST("/problems", controllers.CreateProblem)
+		v1.POST("/problems/create", controllers.CreateProblem)
 		v1.GET("/problems", controllers.GetAllProblems)
 		v1.GET("/problems/:id", controllers.GetProblemById)
 
-		v1.POST("/submissions", controllers.CreateSubmission)
+		v1.POST("/submissions/create", controllers.CreateSubmission)
 		v1.GET("/submissions", controllers.GetAllSubmissions)
 		v1.GET("/submissions/:id", controllers.GetSubmissionById)
+
+		v1.GET("/reset", func(ctx *gin.Context) {
+			ctx.JSON(200, gin.H{"message": "Done"})
+		})
 	}
 	return r
 }

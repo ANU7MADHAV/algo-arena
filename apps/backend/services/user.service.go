@@ -110,6 +110,27 @@ func (u *User) CreateUser(entry User) (User, error) {
 	return entry, nil
 }
 
+func (u *User) GetUserById(id string) (User, error) {
+	collection := ReturnCollectPointer("users")
+
+	mongoId, err := primitive.ObjectIDFromHex(id)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	filter := bson.D{{Key: "_id", Value: mongoId}}
+
+	var user User
+
+	if err = collection.FindOne(context.TODO(), filter).Decode(&user); err != nil {
+		log.Fatal(err)
+	}
+
+	return user, nil
+
+}
+
 func (u *User) UpdateUser(id string, entry User) (User, error) {
 	collection := ReturnCollectPointer("users")
 
