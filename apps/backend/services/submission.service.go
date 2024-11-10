@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -37,11 +38,13 @@ type Response struct {
 func (s Submission) CreateSubmission(entry Submission) (Submission, error) {
 	var user User
 	collection := ReturnCollectPointer("submission")
-	url := "https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=true&wait=false&fields=*"
+	url := "https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=true&wait=true&fields=*"
 
 	languageID := entry.LanguageID
 	sourceCode := entry.SourceCode
 	stdin := entry.Stdin
+
+	// fmt.Println("source ", sourceCode)
 
 	payload := fmt.Sprintf(`{"language_id":%d,"source_code":"%s","stdin":"%s"}`, languageID, sourceCode, stdin)
 	reader := strings.NewReader(payload)
@@ -65,8 +68,8 @@ func (s Submission) CreateSubmission(entry Submission) (Submission, error) {
 		log.Fatal(err)
 	}
 
-	fmt.Println(res)
-	fmt.Println("body", string(body))
+	// fmt.Println(res)
+	// fmt.Println("body", string(body))
 
 	entry.CreatedAt = time.Now()
 	entry.UpdatedAt = time.Now()
@@ -113,7 +116,7 @@ func (s Submission) CreateSubmission(entry Submission) (Submission, error) {
 
 func GetSubmission(token string) (std string, err error) {
 
-	url := fmt.Sprintf("https://judge0-ce.p.rapidapi.com/submissions/%s?_encoded=true&fields=*", token)
+	url := fmt.Sprintf("https://judge0-ce.p.rapidapi.com/submissions/%s?base64_encoded=true&fields=*", token)
 
 	fmt.Println("hitted get")
 
@@ -128,6 +131,8 @@ func GetSubmission(token string) (std string, err error) {
 
 	res, err := http.DefaultClient.Do(req)
 
+	// fmt.Println("response", res)
+
 	if err != nil {
 		panic(err)
 	}
@@ -139,18 +144,22 @@ func GetSubmission(token string) (std string, err error) {
 
 	respons := []byte(body)
 
+	// fmt.Println("response :-", respons)
+
 	var response Response
 
 	if err := json.Unmarshal(respons, &response); err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Stdout:", response.Stdout)
-	//
-	// 	fmt.Println("res", res)
-	// 	fmt.Println("body", string(body))
+	data := []byte(response.Stdout)
+	decoded, err := base64.StdEncoding.DecodeString(string(data))
 
-	return response.Stdout, nil
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("decoded", string(decoded))
+	return string(decoded), nil
 }
 
 func (s *Submission) GetSubmissionById(id string) (Submission, error) {

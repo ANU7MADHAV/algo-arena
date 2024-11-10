@@ -11,7 +11,7 @@ func SetupRoutes() *gin.Engine {
 		ctx.JSON(200, gin.H{"Ping": "Pong"})
 	})
 
-	v1 := r.Group("/v1")
+	v1 := r.Group("/")
 
 	{
 		v1.GET("/", func(ctx *gin.Context) {
