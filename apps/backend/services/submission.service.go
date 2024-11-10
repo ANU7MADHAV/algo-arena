@@ -95,7 +95,7 @@ func (s Submission) CreateSubmission(entry Submission) (Submission, error) {
 
 	if err == nil {
 		insertResult, err := collection.InsertOne(context.Background(), entry)
-		//
+
 		// 		fmt.Println("result", insertResult)
 
 		if err != nil {
